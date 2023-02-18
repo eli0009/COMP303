@@ -191,3 +191,120 @@ class Box {
     }
 }
 ```
+
+## Create a high quality `equals` method
+1. `null` always return false
+1. Use `==` to check if same instance. If so return `true`
+2. Use `instanceof` to check if same type. If not return `false`
+3. Cast to correct type
+4. For each significant field, check that they are equal to eachother
+   - `float`: use `Float.compare(float, float)`
+   - `double`: use `Double.compare(double, double)`
+   - Primitive fields: use `==`
+   - Others: `Objects.equals(Object, Object)`
+
+Additionally, use `@Override`
+
+## Always override `hashCode` when overriding equals
+
+Improper implementation of hashcode will prevent proper functioning in collections like hashmap or hashset. Always test whether 2 equal instances have same hash code.
+
+Requirements:
+1. must consistently return the same value when called on the same object if no info is modified
+2. if two objects are equal according to `equals()`, they must have the same hashcode
+3. two objects that are not equal don't need to have distinct hashcode, but that might improve performance
+
+How to create good hashcode:
+1. select random non-zero constant into int `result` (ex: 17)
+2. for each field:
+   1. compute hashcode `c`
+   2. Combine hashcode `c` into `result`: `result = 31 * result + c`
+3. return result
+
+```java
+import java.util.HashSet;
+import java.util.Objects;
+
+public class Main {
+
+    public static void main(String[] args) {
+        HashSet<Point> points = new HashSet<>();
+        HashSet<ColoredPoint> coloredPoints = new HashSet<>();
+        points.add(new Point(1, 2));
+        coloredPoints.add(new ColoredPoint(1, 2, "red"));
+        System.out.println(points.contains(new Point(1, 2)));
+        System.out.println(coloredPoints.contains(new ColoredPoint(1, 2, "red")));
+        System.out.println(coloredPoints.contains(null));
+    }
+}
+
+class Point {
+    private int x;
+    private int y;
+
+    public Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        // null always false
+        if (other == null)
+            return false;
+        // check if same instance
+        if (this == other)
+            return true;
+        // check if same type
+        if (!(other instanceof Point))
+            return false;
+        // cast to Point
+        Point otherPoint = (Point) other;
+        // check fields
+        return this.x == otherPoint.x && this.y == otherPoint.y;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + x;
+        result = 31 * result + y;
+        return result;
+    }
+}
+
+class ColoredPoint {
+    private String color;
+    private Point point;
+
+    public ColoredPoint(int x, int y, String color) {
+        this.point = new Point(x, y);
+        this.color = Objects.requireNonNull(color);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        // null always false
+        if (other == null)
+            return false;
+        // check if same instance
+        if (this == other)
+            return true;
+        // check if same type
+        if (!(other instanceof ColoredPoint))
+            return false;
+        // cast to ColoredPoint
+        ColoredPoint otherColoredPoint = (ColoredPoint) other;
+        // check fields
+        return this.point.equals(otherColoredPoint.point) && this.color.equals(otherColoredPoint.color);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + point.hashCode();
+        result = 31 * result + color.hashCode();
+        return result;
+    }
+}
+```
