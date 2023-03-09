@@ -1,13 +1,20 @@
 package code;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class Metaprogramming {
     public static void main(String[] args) {
         Flandre flan = new Flandre();
         System.out.println(flan);
         try {
+            // option 1
             Class c = Class.forName("code.Flandre");
+            // option 2
+            // Class c = flan.getClass();
+            // option 3
+            // Class c = Flandre.class;
+            Method[] m = c.getDeclaredMethods();
             Field f = c.getDeclaredField("name");
             f.setAccessible(true);
             f.set(flan, "Flandre");
