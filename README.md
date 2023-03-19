@@ -1,6 +1,6 @@
 # McGill COMP303 - Software Design Notes
 
-My COMP303 course notes. Available in Markdown. A sample of my notes for [Lecture 7](l7.md) is available below.
+My COMP303 course notes. Available in Markdown. A sample of my notes for [Module 3](m3.md) is available below.
 
 
 ---
